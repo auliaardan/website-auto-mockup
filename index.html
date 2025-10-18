@@ -9,22 +9,107 @@
   <!-- SheetJS for XLSX/CSV parsing -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.20.2/dist/xlsx.full.min.js"></script>
   <style>
-    :root{--brand:#4f46e5}
-    body{background:#0f172a;color:#e2e8f0}
-    .navbar{background:linear-gradient(90deg,#1e293b,#0f172a)}
-    .brand{color:#fff;font-weight:700}
-    .card{background:#111827;border:1px solid #1f2937}
-    .table{--bs-table-bg:transparent;--bs-table-color:#e5e7eb}
-    .form-label{color:#cbd5e1}
-    .nav-pills .nav-link.active{background:var(--brand)}
-    a, .link{color:#93c5fd}
-    .badge-brand{background:var(--brand)}
-    .btn-brand{background:var(--brand);color:#fff}
-    .btn-outline-brand{border:1px solid var(--brand);color:#fff}
-    .btn-outline-brand:hover{background:var(--brand)}
-    .shadow-soft{box-shadow:0 8px 30px rgba(0,0,0,.25)}
-    .footer{color:#94a3b8}
-  </style>
+  :root {
+    --brand: #4f46e5;
+    --text-light: #f8fafc;
+    --text-muted: #cbd5e1;
+    --bg-dark: #0f172a;
+    --card-bg: #1e293b;
+    --border-dark: #334155;
+  }
+
+  body {
+    background: var(--bg-dark);
+    color: var(--text-light);
+  }
+
+  .navbar {
+    background: linear-gradient(90deg, #1e3a8a, #312e81);
+  }
+
+  .brand {
+    color: #ffffff;
+    font-weight: 700;
+  }
+
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-dark);
+    color: var(--text-light);
+  }
+
+  .table {
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--text-light);
+  }
+
+  th {
+    color: #f1f5f9;
+  }
+
+  .form-label {
+    color: var(--text-light);
+  }
+
+  input, select, textarea {
+    background-color: #334155;
+    color: #f8fafc;
+    border: 1px solid #475569;
+  }
+
+  input::placeholder {
+    color: #94a3b8;
+  }
+
+  .nav-pills .nav-link.active {
+    background: var(--brand);
+  }
+
+  a, .link {
+    color: #60a5fa;
+  }
+
+  .badge-brand {
+    background: var(--brand);
+  }
+
+  .btn-brand {
+    background: var(--brand);
+    color: #fff;
+  }
+
+  .btn-outline-brand {
+    border: 1px solid var(--brand);
+    color: #fff;
+  }
+
+  .btn-outline-brand:hover {
+    background: var(--brand);
+  }
+
+  .btn-outline-light {
+    border: 1px solid #cbd5e1;
+    color: #f8fafc;
+  }
+
+  .btn-outline-light:hover {
+    background: #cbd5e1;
+    color: #0f172a;
+  }
+
+  .shadow-soft {
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+  }
+
+  .footer {
+    color: var(--text-muted);
+  }
+
+  .text-secondary {
+    color: #94a3b8 !important;
+  }
+</style>
+
 </head>
 <body>
   <nav class="navbar navbar-expand-lg mb-4 shadow-soft">
