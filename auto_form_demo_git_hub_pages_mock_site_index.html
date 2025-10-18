@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AutoForm Demo — Mock Data Entry Site</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+  <!-- SheetJS for XLSX/CSV parsing -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.20.2/dist/xlsx.full.min.js"></script>
+  <style>
+    :root{--brand:#4f46e5}
+    body{background:#0f172a;color:#e2e8f0}
+    .navbar{background:linear-gradient(90deg,#1e293b,#0f172a)}
+    .brand{color:#fff;font-weight:700}
+    .card{background:#111827;border:1px solid #1f2937}
+    .table{--bs-table-bg:transparent;--bs-table-color:#e5e7eb}
+    .form-label{color:#cbd5e1}
+    .nav-pills .nav-link.active{background:var(--brand)}
+    a, .link{color:#93c5fd}
+    .badge-brand{background:var(--brand)}
+    .btn-brand{background:var(--brand);color:#fff}
+    .btn-outline-brand{border:1px solid var(--brand);color:#fff}
+    .btn-outline-brand:hover{background:var(--brand)}
+    .shadow-soft{box-shadow:0 8px 30px rgba(0,0,0,.25)}
+    .footer{color:#94a3b8}
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg mb-4 shadow-soft">
+    <div class="container">
+      <span class="brand navbar-brand">AutoForm Demo</span>
+      <span class="badge badge-brand rounded-pill ms-auto">Static · LocalStorage</span>
+    </div>
+  </nav>
+
+  <main class="container pb-5">
+    <div class="row g-4">
+      <div class="col-12">
+        <div class="card shadow-soft">
+          <div class="card-body">
+            <div class="d-flex flex-wrap align-items-center gap-3 justify-content-between">
+              <div>
+                <h1 class="h4 mb-1">Mock Website for Excel → Web Automation</h1>
+                <p class="mb-0 text-secondary">Three example forms (Patients, Inventory, Contacts). Submissions are saved locally and displayed below. Supports CSV/XLSX import & CSV export. Perfect for GitHub Pages demos.</p>
+              </div>
+              <div class="d-flex gap-2">
+                <button class="btn btn-sm btn-outline-brand" id="btnExportAll">Export All (CSV)</button>
+                <button class="btn btn-sm btn-outline-light" id="btnClearAll">Clear All</button>
+                <a class="btn btn-sm btn-brand" href="#howto" data-bs-toggle="collapse" role="button" aria-expanded="false">How to Use</a>
+              </div>
+            </div>
+            <div class="collapse mt-3" id="howto">
+              <ol class="mb-0 small text-secondary">
+                <li>Pick a form tab below (Patients / Inventory / Contacts).</li>
+                <li>Fill the fields and hit <em>Save</em>. Your data is kept in your browser via <code>localStorage</code>.</li>
+                <li>Use <strong>Import CSV/XLSX</strong> to bulk add. Headers must match the field labels shown.</li>
+                <li>Use <strong>Export CSV</strong> to download records. <strong>Clear</strong> removes only that tab’s data.</li>
+                <li>This site is 100% static — ready for GitHub Pages. No backend required.</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12">
+        <ul class="nav nav-pills" id="pills-tab" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="patients-tab" data-bs-toggle="pill" data-bs-target="#patients" type="button" role="tab">Patients</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="inventory-tab" data-bs-toggle="pill" data-bs-target="#inventory" type="button" role="tab">Inventory</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="contacts-tab" data-bs-toggle="pill" data-bs-target="#contacts" type="button" role="tab">Contacts</button>
+          </li>
+        </ul>
+        <div class="tab-content mt-3" id="pills-tabContent">
+          <!-- Patients Tab -->
+          <section class="tab-pane fade show active" id="patients" role="tabpanel" aria-labelledby="patients-tab">
+            <div class="row g-3">
+              <div class="col-lg-5">
+                <div class="card h-100">
+                  <div class="card-body">
+                    <h2 class="h5">Patient Intake</h2>
+                    <form id="form-patients" class="mt-3">
+                      <div class="mb-2"><label class="form-label" for="pt_name">Name</label><input id="pt_name" name="Name" class="form-control" placeholder="Jane Doe" required></div>
+                      <div class="mb-2"><label class="form-label" for="pt_dob">Date of Birth</label><input id="pt_dob" name="Date of Birth" type="date" class="form-control" required></div>
+                      <div class="mb-2"><label class="form-label" for="pt_mrn">MRN</label><input id="pt_mrn" name="MRN" class="form-control" placeholder="MRN-001"></div>
+                      <div class="mb-2"><label class="form-label" for="pt_reason">Reason for Visit</label><input id="pt_reason" name="Reason for Visit" class="form-control" placeholder="Check-up"></div>
+                      <div class="d-flex gap-2 mt-3">
+                        <button class="btn btn-brand" type="submit">Save</button>
+                        <button class="btn btn-outline-light" type="reset">Reset</button>
+                        <button class="btn btn-outline-brand ms-auto" type="button" data-template="patients">Template CSV</button>
+                        <label class="btn btn-outline-brand mb-0">Import CSV/XLSX
+                          <input type="file" accept=".csv,.xlsx,.xls" class="d-none import" data-target="patients">
+                        </label>
+                        <button class="btn btn-outline-light" type="button" data-export="patients">Export CSV</button>
+                        <button class="btn btn-outline-light" type="button" data-clear="patients">Clear</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-7">
+                <div class="card h-100">
+                  <div class="card-body">
+                    <h3 class="h6">Saved Patients</h3>
+                    <div class="table-responsive">
+                      <table class="table table-sm align-middle" id="table-patients">
+                        <thead><tr></tr></thead>
+                        <tbody></tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Inventory Tab -->
+          <section class="tab-pane fade" id="inventory" role="tabpanel" aria-labelledby="inventory-tab">
+            <div class="row g-3">
+              <div class="col-lg-5">
+                <div class="card h-100">
+                  <div class="card-body">
+                    <h2 class="h5">Inventory Item</h2>
+                    <form id="form-inventory" class="mt-3">
+                      <div class="mb-2"><label class="form-label" for="inv_name">Item</label><input id="inv_name" name="Item" class="form-control" placeholder="Surgical Gloves" required></div>
+                      <div class="mb-2"><label class="form-label" for="inv_sku">SKU</label><input id="inv_sku" name="SKU" class="form-control" placeholder="GLV-100"></div>
+                      <div class="mb-2"><label class="form-label" for="inv_qty">Quantity</label><input id="inv_qty" name="Quantity" type="number" min="0" class="form-control" placeholder="50" required></div>
+                      <div class="mb-2"><label class="form-label" for="inv_exp">Expiry</label><input id="inv_exp" name="Expiry" type="date" class="form-control"></div>
+                      <div class="d-flex gap-2 mt-3">
+                        <button class="btn btn-brand" type="submit">Save</button>
+                        <button class="btn btn-outline-light" type="reset">Reset</button>
+                        <button class="btn btn-outline-brand ms-auto" type="button" data-template="inventory">Template CSV</button>
+                        <label class="btn btn-outline-brand mb-0">Import CSV/XLSX
+                          <input type="file" accept=".csv,.xlsx,.xls" class="d-none import" data-target="inventory">
+                        </label>
+                        <button class="btn btn-outline-light" type="button" data-export="inventory">Export CSV</button>
+                        <button class="btn btn-outline-light" type="button" data-clear="inventory">Clear</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-7">
+                <div class="card h-100">
+                  <div class="card-body">
+                    <h3 class="h6">Saved Inventory</h3>
+                    <div class="table-responsive">
+                      <table class="table table-sm align-middle" id="table-inventory">
+                        <thead><tr></tr></thead>
+                        <tbody></tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Contacts Tab -->
+          <section class="tab-pane fade" id="contacts" role="tabpanel" aria-labelledby="contacts-tab">
+            <div class="row g-3">
+              <div class="col-lg-5">
+                <div class="card h-100">
+                  <div class="card-body">
+                    <h2 class="h5">Business Contact</h2>
+                    <form id="form-contacts" class="mt-3">
+                      <div class="mb-2"><label class="form-label" for="ct_name">Name</label><input id="ct_name" name="Name" class="form-control" placeholder="John Smith" required></div>
+                      <div class="mb-2"><label class="form-label" for="ct_company">Company</label><input id="ct_company" name="Company" class="form-control" placeholder="Acme Ltd"></div>
+                      <div class="mb-2"><label class="form-label" for="ct_email">Email</label><input id="ct_email" name="Email" type="email" class="form-control" placeholder="john@acme.com"></div>
+                      <div class="mb-2"><label class="form-label" for="ct_phone">Phone</label><input id="ct_phone" name="Phone" class="form-control" placeholder="+62..."></div>
+                      <div class="d-flex gap-2 mt-3">
+                        <button class="btn btn-brand" type="submit">Save</button>
+                        <button class="btn btn-outline-light" type="reset">Reset</button>
+                        <button class="btn btn-outline-brand ms-auto" type="button" data-template="contacts">Template CSV</button>
+                        <label class="btn btn-outline-brand mb-0">Import CSV/XLSX
+                          <input type="file" accept=".csv,.xlsx,.xls" class="d-none import" data-target="contacts">
+                        </label>
+                        <button class="btn btn-outline-light" type="button" data-export="contacts">Export CSV</button>
+                        <button class="btn btn-outline-light" type="button" data-clear="contacts">Clear</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-7">
+                <div class="card h-100">
+                  <div class="card-body">
+                    <h3 class="h6">Saved Contacts</h3>
+                    <div class="table-responsive">
+                      <table class="table table-sm align-middle" id="table-contacts">
+                        <thead><tr></tr></thead>
+                        <tbody></tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer text-center py-4">
+    <div class="container small">
+      Built for content demos. Host on <a class="link" href="https://pages.github.com/" target="_blank" rel="noopener">GitHub Pages</a> · No server, no database.
+    </div>
+  </footer>
+
+<script>
+// ===== Core Storage Helpers =====
+const KEYS = {
+  patients: 'autoform_patients',
+  inventory: 'autoform_inventory',
+  contacts: 'autoform_contacts'
+};
+
+function load(key){
+  try{ return JSON.parse(localStorage.getItem(key)) || []; }catch{ return []; }
+}
+function save(key, data){ localStorage.setItem(key, JSON.stringify(data)); }
+
+function formToObject(form){
+  const obj = {};
+  [...new FormData(form).entries()].forEach(([k,v])=>{ obj[k]=v; });
+  obj._ts = new Date().toISOString();
+  return obj;
+}
+
+function renderTable(target, arr){
+  const table = document.querySelector(`#table-${target}`);
+  const thead = table.querySelector('thead tr');
+  const tbody = table.querySelector('tbody');
+  tbody.innerHTML = '';
+  if(!arr.length){
+    thead.innerHTML = '';
+    tbody.innerHTML = `<tr><td class="text-secondary" colspan="99">No data yet.</td></tr>`;
+    return;
+  }
+  const cols = Object.keys(arr[0]).filter(k=>k!=="_ts");
+  thead.innerHTML = `<th>#</th>` + cols.map(c=>`<th>${c}</th>`).join('') + '<th></th>';
+  arr.forEach((row,i)=>{
+    const tds = cols.map(c=>`<td>${row[c]??''}</td>`).join('');
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td class="text-secondary">${i+1}</td>${tds}<td><button class="btn btn-sm btn-outline-light" data-del="${i}" data-target="${target}">Delete</button></td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function onDelete(e){
+  const btn = e.target.closest('button[data-del]');
+  if(!btn) return;
+  const target = btn.getAttribute('data-target');
+  const idx = +btn.getAttribute('data-del');
+  const key = KEYS[target];
+  const arr = load(key);
+  arr.splice(idx,1);
+  save(key,arr);
+  renderTable(target, arr);
+}
+
+document.addEventListener('click', onDelete);
+
+// ===== Module Setup =====
+const modules = {
+  patients: {
+    key: KEYS.patients,
+    form: document.getElementById('form-patients'),
+    fields: ['Name','Date of Birth','MRN','Reason for Visit']
+  },
+  inventory: {
+    key: KEYS.inventory,
+    form: document.getElementById('form-inventory'),
+    fields: ['Item','SKU','Quantity','Expiry']
+  },
+  contacts: {
+    key: KEYS.contacts,
+    form: document.getElementById('form-contacts'),
+    fields: ['Name','Company','Email','Phone']
+  }
+};
+
+for(const [target, cfg] of Object.entries(modules)){
+  // initial render
+  renderTable(target, load(cfg.key));
+  // submit handler
+  cfg.form.addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const data = load(cfg.key);
+    data.push(formToObject(cfg.form));
+    save(cfg.key, data);
+    cfg.form.reset();
+    renderTable(target, data);
+  });
+}
+
+// ===== Export/Import/Template per Tab =====
+function toCSV(arr){
+  if(!arr.length) return '';
+  const cols = Object.keys(arr[0]).filter(k=>k!=="_ts");
+  const header = cols.join(',');
+  const rows = arr.map(o=> cols.map(c=> JSON.stringify(String(o[c]??'')).replace(/^"|"$/g,'').includes(',') ? '"'+String(o[c]).replace(/"/g,'\"')+'"' : String(o[c]).replace(/\n/g,' ')).join(','));
+  return [header, ...rows].join('\n');
+}
+
+function download(filename, text){
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([text], {type:'text/plain'}));
+  a.download = filename; a.click(); URL.revokeObjectURL(a.href);
+}
+
+function downloadCSVTemplate(target){
+  const fields = modules[target].fields;
+  const csv = fields.join(',') + '\n';
+  download(`${target}_template.csv`, csv);
+}
+
+function exportCSV(target){
+  const data = load(modules[target].key).map(({_ts, ...rest})=>rest);
+  download(`${target}.csv`, toCSV(data));
+}
+
+function exportAllCSV(){
+  const all = Object.entries(modules).flatMap(([t,cfg])=>{
+    const rows = load(cfg.key).map(({_ts, ...rest})=>({Tab:t, ...rest}));
+    return rows;
+  });
+  if(!all.length){ alert('No data to export.'); return; }
+  const cols = Array.from(new Set(all.flatMap(o=>Object.keys(o))));
+  const header = cols.join(',');
+  const rows = all.map(o=> cols.map(c=> o[c]??'').join(','));
+  download('all_tabs.csv', [header, ...rows].join('\n'));
+}
+
+function parseFile(file){
+  return new Promise((resolve,reject)=>{
+    const reader = new FileReader();
+    const ext = file.name.toLowerCase().split('.').pop();
+    reader.onload = (e)=>{
+      try{
+        if(ext === 'csv'){
+          const text = e.target.result;
+          const wb = XLSX.read(text, {type:'string'});
+          const ws = wb.Sheets[wb.SheetNames[0]];
+          resolve(XLSX.utils.sheet_to_json(ws));
+        }else{
+          const data = new Uint8Array(e.target.result);
+          const wb = XLSX.read(data, {type:'array'});
+          const ws = wb.Sheets[wb.SheetNames[0]];
+          resolve(XLSX.utils.sheet_to_json(ws));
+        }
+      }catch(err){ reject(err); }
+    };
+    if(ext === 'csv') reader.readAsText(file); else reader.readAsArrayBuffer(file);
+  });
+}
+
+function importRows(target, rows){
+  if(!rows.length) return 0;
+  const fields = modules[target].fields; // expected headers
+  const normalized = rows.map(r=>{
+    const o={};
+    fields.forEach(f=>{ o[f] = r[f] ?? ''; });
+    return o;
+  });
+  const key = modules[target].key;
+  const data = load(key);
+  normalized.forEach(n=> data.push({...n, _ts:new Date().toISOString()}));
+  save(key, data);
+  renderTable(target, data);
+  return normalized.length;
+}
+
+// Button wiring
+
+document.querySelectorAll('[data-template]').forEach(btn=>{
+  btn.addEventListener('click',()=> downloadCSVTemplate(btn.getAttribute('data-template')));
+});
+
+document.querySelectorAll('[data-export]').forEach(btn=>{
+  btn.addEventListener('click',()=> exportCSV(btn.getAttribute('data-export')));
+});
+
+document.querySelectorAll('[data-clear]').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const target = btn.getAttribute('data-clear');
+    if(confirm(`Clear all ${target} records?`)){
+      save(modules[target].key, []);
+      renderTable(target, []);
+    }
+  });
+});
+
+// Import inputs
+
+document.querySelectorAll('input.import').forEach(inp=>{
+  inp.addEventListener('change', async ()=>{
+    const target = inp.getAttribute('data-target');
+    if(!inp.files?.length) return;
+    try{
+      const rows = await parseFile(inp.files[0]);
+      const added = importRows(target, rows);
+      alert(`Imported ${added} ${target} record(s).`);
+    }catch(err){
+      console.error(err);
+      alert('Failed to import. Ensure your headers match the template.');
+    }finally{
+      inp.value = '';
+    }
+  });
+});
+
+// Global controls
+
+document.getElementById('btnExportAll').addEventListener('click', exportAllCSV);
+
+document.getElementById('btnClearAll').addEventListener('click', ()=>{
+  if(!confirm('Clear ALL tabs data?')) return;
+  for(const cfg of Object.values(modules)) save(cfg.key, []);
+  for(const t of Object.keys(modules)) renderTable(t, []);
+});
+</script>
+</body>
+</html>
